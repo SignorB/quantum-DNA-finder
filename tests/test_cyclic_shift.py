@@ -20,8 +20,8 @@ def encode_shift(circuit, shift_register, shift):
             circuit.x(qubit)
 
 
-def rotate_right(value, shift):
-    """Classical reference implementation of a cyclic right rotation."""
+def rotate_left(value, shift):
+    """Classical reference implementation of a cyclic left rotation."""
     if not value:
         return value
 
@@ -30,7 +30,7 @@ def rotate_right(value, shift):
     if shift == 0:
         return value
 
-    return value[-shift:] + value[:-shift]
+    return value[shift:] + value[:shift]
 
 
 def test_controlled_cyclic_shift():
@@ -53,7 +53,7 @@ def test_controlled_cyclic_shift():
         )
 
         # Build the state that we expect to obtain.
-        expected_text = rotate_right(text_value, shift)
+        expected_text = rotate_left(text_value, shift)
 
         expected_circuit = QuantumCircuit(text, index)
 
