@@ -55,9 +55,9 @@ def build_shift_superposition(text_value, pattern_value):
     # Step 3
     select_valid_shifts(circuit, index, valid_shifts)
 
-    for bit_position, control in enumerate(index):
-        # Step 4
-        controlled_cyclic_shift(circuit, text, index)
+    # Step 4
+    controlled_cyclic_shift(circuit, text, index)
+
     return circuit
 
 
