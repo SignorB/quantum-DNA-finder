@@ -4,6 +4,7 @@ import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.quantum_info import Statevector
 from cyclic_shift import controlled_cyclic_shift
+from xor_compare import apply_pattern_xor
 
 
 def encode_bits(circuit, register, value):
@@ -57,6 +58,9 @@ def build_shift_superposition(text_value, pattern_value):
 
     # Step 4
     controlled_cyclic_shift(circuit, text, index)
+
+    # Step 5
+    apply_pattern_xor(circuit, pattern, text)
 
     return circuit
 
