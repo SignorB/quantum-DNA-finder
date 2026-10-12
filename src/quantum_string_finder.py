@@ -5,6 +5,7 @@ from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.quantum_info import Statevector
 from cyclic_shift import controlled_cyclic_shift
 from xor_compare import apply_pattern_xor
+from mark_zero import mark_all_zero
 
 
 def encode_bits(circuit, register, value):
@@ -45,10 +46,13 @@ def build_shift_superposition(text_value, pattern_value):
     valid_shifts = range(len(text_value) - len(pattern_value) + 1)
     index_size = max(1, math.ceil(math.log2(len(valid_shifts))))
 
+    # Registers
     pattern = QuantumRegister(len(pattern_value), "pattern")
     text = QuantumRegister(len(text_value), "text")
     index = QuantumRegister(index_size, "index")
-    circuit = QuantumCircuit(pattern, text, index)
+    marker = QuantumRegister(1, "marker")
+    # Circuit
+    circuit = QuantumCircuit(pattern, text, index, marker)
 
     # Step 2
     encode_bits(circuit, pattern, pattern_value)
@@ -62,6 +66,8 @@ def build_shift_superposition(text_value, pattern_value):
     # Step 5
     apply_pattern_xor(circuit, pattern, text)
 
+    # Step 6
+    mark_all_zero(circuit, pattern, marker[0])
     return circuit
 
 
@@ -69,7 +75,7 @@ def verify_structure(circuit, number_of_valid_shifts):
     """Verify the register layout and shift superposition without measurement."""
     operation_names = {instruction.operation.name for instruction in circuit.data}
     assert "measure" not in operation_names
-    assert circuit.num_qubits == sum(circuit.qregs[i].size for i in range(3))
+    assert circuit.num_qubits == sum(register.size for register in circuit.qregs)
 
     state = Statevector.from_instruction(circuit)
     index_qubits = circuit.qregs[2]
