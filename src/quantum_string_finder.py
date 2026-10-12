@@ -3,9 +3,11 @@ import math
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.quantum_info import Statevector
-from cyclic_shift import controlled_cyclic_shift
-from xor_compare import apply_pattern_xor
-from mark_zero import mark_all_zero
+from .cyclic_shift import controlled_cyclic_shift
+from .cyclic_shift import inverse_controlled_cyclic_shift
+from .xor_compare import apply_pattern_xor
+from .mark_zero import mark_all_zero
+from .uncompute import uncompute_match
 
 
 def encode_bits(circuit, register, value):
@@ -68,6 +70,9 @@ def build_shift_superposition(text_value, pattern_value):
 
     # Step 6
     mark_all_zero(circuit, pattern, marker[0])
+
+    # Step 7
+    uncompute_match(circuit, pattern, text, index)
     return circuit
 
 
