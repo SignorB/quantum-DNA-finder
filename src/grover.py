@@ -31,13 +31,14 @@ def diffusion(qc, shift, valid_count=None):
 
 def amplify_matches(qc, iterations=1):
     pattern, text, shift, marker = qc.qregs
-    valid_count = len(text) - len(pattern) + 1
+    bits_per_symbol = qc.metadata.get("bits_per_symbol", 1)
+    valid_count = (len(text) - len(pattern)) // bits_per_symbol + 1
 
     check = QuantumCircuit(*qc.qregs)
-    controlled_cyclic_shift(check, text, shift)
+    controlled_cyclic_shift(check, text, shift, bits_per_symbol)
     apply_pattern_xor(check, pattern, text)
     mark_all_zero(check, pattern, marker[0])
-    uncompute_match(check, pattern, text, shift)
+    uncompute_match(check, pattern, text, shift, bits_per_symbol)
 
     result = qc.copy()
     for iteration in range(iterations):

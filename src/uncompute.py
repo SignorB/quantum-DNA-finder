@@ -9,6 +9,7 @@ def uncompute_match(
     pattern_qubits,
     text_qubits,
     shift_qubits,
+    bits_per_symbol=1,
 ) -> None:
     """
     This reverses Steps 5 and 4 while leaving the marker qubit untouched.
@@ -31,4 +32,5 @@ def uncompute_match(
         circuit,
         text_qubits,
         shift_qubits,
+        bits_per_symbol,
     )

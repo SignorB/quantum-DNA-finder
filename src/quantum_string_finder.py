@@ -40,12 +40,15 @@ def select_valid_shifts(circuit, index_register, valid_shifts):
     circuit.prepare_state(amplitudes, index_register)
 
 
-def build_shift_superposition(text_value, pattern_value):
-    """Build the unmeasured register-and-shift portion of the matcher."""
+def build_shift_superposition(text_value, pattern_value, bits_per_symbol=1):
+    """Build from binary-encoded strings; each shift advances one whole symbol."""
     if not pattern_value or len(pattern_value) > len(text_value):
         raise ValueError("Pattern must be non-empty and no longer than the text.")
 
-    valid_shifts = range(len(text_value) - len(pattern_value) + 1)
+    if (bits_per_symbol < 1 or len(text_value) % bits_per_symbol
+            or len(pattern_value) % bits_per_symbol):
+        raise ValueError("Text and pattern must contain complete symbol blocks.")
+    valid_shifts = range((len(text_value) - len(pattern_value)) // bits_per_symbol + 1)
     index_size = max(1, math.ceil(math.log2(len(valid_shifts))))
 
     # Registers
@@ -55,6 +58,7 @@ def build_shift_superposition(text_value, pattern_value):
     marker = QuantumRegister(1, "marker")
     # Circuit
     circuit = QuantumCircuit(pattern, text, index, marker)
+    circuit.metadata["bits_per_symbol"] = bits_per_symbol
 
     # Step 2
     encode_bits(circuit, pattern, pattern_value)
@@ -63,7 +67,7 @@ def build_shift_superposition(text_value, pattern_value):
     select_valid_shifts(circuit, index, valid_shifts)
 
     # Step 4
-    controlled_cyclic_shift(circuit, text, index)
+    controlled_cyclic_shift(circuit, text, index, bits_per_symbol)
 
     # Step 5
     apply_pattern_xor(circuit, pattern, text)
@@ -72,7 +76,7 @@ def build_shift_superposition(text_value, pattern_value):
     mark_all_zero(circuit, pattern, marker[0])
 
     # Step 7
-    uncompute_match(circuit, pattern, text, index)
+    uncompute_match(circuit, pattern, text, index, bits_per_symbol)
     return circuit
 
 
