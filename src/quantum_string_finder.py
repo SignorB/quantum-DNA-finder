@@ -6,7 +6,7 @@ from qiskit.quantum_info import Statevector
 from .cyclic_shift import controlled_cyclic_shift
 from .cyclic_shift import inverse_controlled_cyclic_shift
 from .xor_compare import apply_pattern_xor
-from .mark_zero import mark_all_zero
+from .mark_zero import mark_valid_match
 from .uncompute import uncompute_match
 
 
@@ -73,7 +73,7 @@ def build_shift_superposition(text_value, pattern_value, bits_per_symbol=1):
     apply_pattern_xor(circuit, pattern, text)
 
     # Step 6
-    mark_all_zero(circuit, pattern, marker[0])
+    mark_valid_match(circuit, pattern, marker[0], index, len(valid_shifts))
 
     # Step 7
     uncompute_match(circuit, pattern, text, index, bits_per_symbol)

@@ -3,7 +3,7 @@ from qiskit.primitives import StatevectorSampler
 from qiskit.quantum_info import Statevector
 
 from .cyclic_shift import controlled_cyclic_shift
-from .mark_zero import mark_all_zero
+from .mark_zero import mark_valid_match
 from .quantum_string_finder import select_valid_shifts
 from .uncompute import uncompute_match
 from .xor_compare import apply_pattern_xor
@@ -37,7 +37,7 @@ def amplify_matches(qc, iterations=1):
     check = QuantumCircuit(*qc.qregs)
     controlled_cyclic_shift(check, text, shift, bits_per_symbol)
     apply_pattern_xor(check, pattern, text)
-    mark_all_zero(check, pattern, marker[0])
+    mark_valid_match(check, pattern, marker[0], shift, valid_count)
     uncompute_match(check, pattern, text, shift, bits_per_symbol)
 
     result = qc.copy()
